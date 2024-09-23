@@ -1,0 +1,33 @@
+{
+    "name": "rmtdev",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rodrigovallades.es7-react-js-snippets",
+                "dbaeumer.vscode-eslint",
+                "ecmel.vscode-html-css",
+                "ritwickdey.LiveServer",
+                "csstools.postcss",
+                "esbenp.prettier-vscode",
+                "Prisma.prisma",
+                "bradlc.vscode-tailwindcss",
+                "eamodio.gitlens",
+                "Codeium.codeium"
+            ]
+        }
+    },
+    "features": {
+        "./zsh-plugins": {
+            "plugins": "zsh-syntax-highlighting zsh-autosuggestions bazel",
+            "omzPlugins": "https://github.com/zsh-users/zsh-syntax-highlighting https://github.com/zsh-users/zsh-autosuggestions"
+        }
+    },
+    "mounts": [
+        "source=/mnt/drive/data,target=/mnt/data,type=bind,consistency=cached",
+        "source=projectname-bashhistory,target=/commandhistory,type=volume"
+    ]
+}

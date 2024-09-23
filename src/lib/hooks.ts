@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { TJobItem, TJobItemExpand } from "./types";
 import { BASE_URL } from "./constants";
 import { useQuery } from "@tanstack/react-query";
+import { handleError } from "./utils";
 
 export function useActiveId() {
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -43,7 +44,7 @@ export function useJobItemContent(id: number | null) {
       enabled: Boolean(id),
       refetchOnWindowFocus: false,
       retry: false,
-      onError: () => {},
+      onError: handleError,
       staleTime: 1000 * 60 * 60,
     }
   );
@@ -80,7 +81,7 @@ export function useJobItems(searchText: string) {
       enabled: Boolean(searchText),
       refetchOnWindowFocus: false,
       retry: false,
-      onError: () => {},
+      onError: handleError,
       staleTime: 1000 * 60 * 60,
     }
   );

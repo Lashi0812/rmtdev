@@ -1,5 +1,46 @@
 import { useState, useEffect } from "react";
-import { TJobItem } from "./types";
+import { TJobItem, TJobItemExpand } from "./types";
+import { BASE_URL } from "./constants";
+
+export function useActiveId() {
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveId(+window.location.hash.slice(1));
+    };
+    window.addEventListener("hashchange", handleHashChange);
+
+    handleHashChange();
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  });
+
+  return activeId;
+}
+
+export function useJobItemContent(id: number | null) {
+  const [jobItemContent, setJobItemContent] = useState<TJobItemExpand | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchData = async () => {
+      setIsLoading(true);
+      const response = await fetch(`${BASE_URL}/${id}`);
+      const data = await response.json();
+      setIsLoading(false);
+      setJobItemContent(data.jobItem);
+    };
+
+    fetchData();
+  }, [id]);
+
+  return [jobItemContent, isLoading] as const;
+}
 
 export function useJobItems(searchText: string) {
   const [jobItems, setJobItems] = useState<TJobItem[]>([]);
@@ -11,9 +52,7 @@ export function useJobItems(searchText: string) {
     if (searchText.length === 0) return;
     setIsLoading(true);
     const fetctData = async () => {
-      const response = await fetch(
-        `https://bytegrad.com/course-assets/projects/rmtdev/api/data?search=${searchText}`
-      );
+      const response = await fetch(`${BASE_URL}?search=${searchText}`);
       const data = await response.json();
       setJobItems(data.jobItems);
       setIsLoading(false);

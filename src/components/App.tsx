@@ -14,7 +14,7 @@ import ResultsCount from "./ResultsCount";
 import SortingControls from "./SortingControls";
 import { useDebounce, useJobItems } from "../lib/hooks";
 import { Toaster } from "react-hot-toast";
-import { PageDirection } from "../lib/types";
+import { PageDirection, SortBy } from "../lib/types";
 import { RESULTS_PER_PAGE } from "../lib/constants";
 
 function App() {
@@ -23,12 +23,22 @@ function App() {
   const debounceSearchText = useDebounce(searchText);
   const { jobItems, isLoading } = useJobItems(debounceSearchText);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<SortBy>("relevant");
 
   // derived state
   const totalNumberOfJobs = jobItems?.length || 0;
   const totalNumberOfPages = totalNumberOfJobs / RESULTS_PER_PAGE;
-  const jobItemsSliced =
-    jobItems?.slice(currentPage * RESULTS_PER_PAGE - RESULTS_PER_PAGE, currentPage * RESULTS_PER_PAGE) || [];
+  const jobItemsSorted = [...(jobItems || [])]?.sort((a, b) => {
+    if (sortBy === "relevant") {
+      return b.relevanceScore - a.relevanceScore;
+    } else {
+      return a.daysAgo - b.daysAgo;
+    }
+  });
+  const jobItemsSortedAndSliced = jobItemsSorted?.slice(
+    currentPage * RESULTS_PER_PAGE - RESULTS_PER_PAGE,
+    currentPage * RESULTS_PER_PAGE
+  );
 
   // event handlers
   const onClick = (direction: PageDirection) => {
@@ -37,6 +47,11 @@ function App() {
     } else if (direction === "previous") {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  const handleSortBy = (sortBy: SortBy) => {
+    setCurrentPage(1);
+    setSortBy(sortBy);
   };
 
   return (
@@ -53,9 +68,9 @@ function App() {
         <Sidebar>
           <SidebarTop>
             <ResultsCount totalNumberOfJobs={totalNumberOfJobs} />
-            <SortingControls />
+            <SortingControls onClick={handleSortBy} sortBy={sortBy} />
           </SidebarTop>
-          <JobList jobItems={jobItemsSliced} isLoading={isLoading} />
+          <JobList jobItems={jobItemsSortedAndSliced} isLoading={isLoading} />
           <PaginationControls
             currentPage={currentPage}
             totalNumberOfPages={totalNumberOfPages}

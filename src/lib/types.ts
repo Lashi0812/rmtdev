@@ -18,5 +18,6 @@ export type TJobItemExpand = TJobItem & {
   companyURL: string;
 };
 
-
 export type PageDirection = "next" | "previous";
+
+export type SortBy = "relevant" | "recent";
